@@ -304,7 +304,7 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
 
 !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
 
-  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,2,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
   if (IDAT(2).eq.1) then ! Deterministic with PC
      fvartmp=0.0d0
@@ -380,7 +380,7 @@ subroutine EV_G(N, X, NEW_X, M, G, IDAT, DAT, IERR)
      
      !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
      
-     call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+     call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,2,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
      if (IDAT(2).eq.1) then
         fvartmp=0.0
@@ -498,7 +498,7 @@ subroutine EV_GRAD_F(N, X, NEW_X, GRAD, IDAT, DAT, IERR)
 
 !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
 
-  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,2,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
      if (IDAT(2).eq.1) then
         fvartmp=0.0
@@ -713,7 +713,7 @@ subroutine EV_JAC_G(TASK, N, X, NEW_X, M, NZ, ACON, AVAR, A,IDAT, DAT, IERR)
 
 !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
 
-  call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+  call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,2,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
            if (fvartmp.lt.0.0) fvartmp=0.0
 
