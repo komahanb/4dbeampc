@@ -73,13 +73,14 @@ program problemPC
   ! Area design variables
 
   do i=1,N-3
-     X(i)   = 1.0  
-     X_L(i) = 0.0 
-     X_U(i) = infbound 
+     X(i)   = 2.0  
+     X_L(i) = 1.0d0
+     X_U(i) = 5.0d0
   end do
-!!$  x(1)=4.04559414776532
-!!$  x(2)=0.240187148453470
-!!$  x(3)=0.249311223125826
+
+!  x(1)=4.0
+!  x(2)=0.0
+!  x(3)=1.75
   ! orientation design variables
 
   ! phi(1)
@@ -108,7 +109,7 @@ program problemPC
   !===================================================================
 
   probtype(:)=1
-  kprob=4
+  kprob=1
 
   IDAT(1)=kprob
   IDAT(2)=0
@@ -151,18 +152,18 @@ program problemPC
   dat(1000+1)=10.0 !height ref
   dat(1000+2)=1.0e7 !E
   dat(1000+3)=0.1 !gamma
-  dat(1000+4)=45.0*pi/180.0
-  dat(1000+5)=20000.0
+  dat(1000+4)=50.0*pi/180.0
+  dat(1000+5)=30000.0
 
   ! Max constraint values
 
   !Tensile
   dat(1000+6)=5000.0    ! psi tensile_sigma1_max=dat(6)      
-  dat(1000+7)=20000.0    ! psi tensile_sigma2_max=dat(7)
+  dat(1000+7)=10000.0    ! psi tensile_sigma2_max=dat(7)
   dat(1000+8)=5000.0    ! psi tensile_sigma3_max=dat(8)
   !Compressive
   dat(1000+9)=5000.0    ! psi comp_sigma1_max=dat(9)
-  dat(1000+10)=20000.0   ! psi comp_sigma2_max=dat(10)
+  dat(1000+10)=10000.0   ! psi comp_sigma2_max=dat(10)
   dat(1000+11)=5000.0   ! psi comp_sigma3_max=dat(11)
   !Displacement
   dat(1000+12)=0.005    ! in  max_u_disp=dat(12)
@@ -250,7 +251,7 @@ program problemPC
         write(*,*) 'LAM(',i,') = ',LAM(i)
      enddo
      write(*,*)
-     write(*,*) 'Weight and its variance:',DAT(N+1),DAT(N+2)
+     write(*,'(a,4F13.4)') 'Weight, variance, SD, CV:',DAT(N+1),DAT(N+2),sqrt(DAT(N+2)),sqrt(DAT(N+2))/DAT(N+1)
 
   end if
   !
@@ -303,7 +304,7 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
 
 !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
 
-  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
   if (IDAT(2).eq.1) then ! Deterministic with PC
      fvartmp=0.0d0
@@ -325,6 +326,7 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
   if (id_proc.eq.0) then
      print*,''
      write(*,'(4x,a,3F13.4)') '>>Objective:',fmeantmp,fvartmp,fmeantmp+fvartmp
+     write(*,'(4x,a,F13.4)') '>>Coeff of variance:',sqrt(fvartmp)/fmeantmp
   !   print*,'fmeanprime,fvarprime:',fmeanprimetmp(1:N),fvarprimetmp(1:N)
   end if
 
@@ -378,7 +380,7 @@ subroutine EV_G(N, X, NEW_X, M, G, IDAT, DAT, IERR)
      
      !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
      
-     call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+     call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
      if (IDAT(2).eq.1) then
         fvartmp=0.0
@@ -496,7 +498,7 @@ subroutine EV_GRAD_F(N, X, NEW_X, GRAD, IDAT, DAT, IERR)
 
 !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
 
-  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
      if (IDAT(2).eq.1) then
         fvartmp=0.0
@@ -711,7 +713,7 @@ subroutine EV_JAC_G(TASK, N, X, NEW_X, M, NZ, ACON, AVAR, A,IDAT, DAT, IERR)
 
 !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
 
-  call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+  call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
            if (fvartmp.lt.0.0) fvartmp=0.0
 
@@ -943,7 +945,7 @@ subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_S
   !     And set ISTOP to 1 if you want Ipopt to stop now.  Below is just a
   !     simple example.
   !
-  if (ITER_COUNT .gt. 1 .and. DNORM.le.1D-03 .and. inf_pr.le.1.0D-03) ISTOP = 1
+  if (ITER_COUNT .gt. 1 .and. DNORM.le.1D-04 .and. inf_pr.le.1.0D-04) ISTOP = 1
 
   
   return
