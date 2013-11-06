@@ -74,7 +74,7 @@ program problemPC
 
   do i=1,N-3
      X(i)   = 2.0  
-     X_L(i) = 1.0d0
+     X_L(i) = 0.25d0
      X_U(i) = 5.0d0
   end do
 
@@ -109,7 +109,7 @@ program problemPC
   !===================================================================
 
   probtype(:)=1
-  kprob=1
+  kprob=4
 
   IDAT(1)=kprob
   IDAT(2)=0
@@ -945,7 +945,7 @@ subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_S
   !     And set ISTOP to 1 if you want Ipopt to stop now.  Below is just a
   !     simple example.
   !
-  if (ITER_COUNT .gt. 1 .and. DNORM.le.1D-04 .and. inf_pr.le.1.0D-04) ISTOP = 1
+  if (ITER_COUNT .gt. 1 .and. DNORM.le.1D-03 .and. inf_pr.le.1.0D-04) ISTOP = 1
 
   
   return
