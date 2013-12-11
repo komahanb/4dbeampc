@@ -156,7 +156,6 @@ program problemPC
   dat(1000+5)=30000.0
 
   ! Max constraint values
-
   !Tensile
   dat(1000+6)=5000.0    ! psi tensile_sigma1_max=dat(6)      
   dat(1000+7)=10000.0    ! psi tensile_sigma2_max=dat(7)
@@ -188,6 +187,8 @@ program problemPC
   !
 
   if (id_proc.eq.0) open(unit=76,file='Opt.his',form='formatted',status='replace')
+
+  if (id_proc.eq.0) open(unit=86,file='beta.his',form='formatted',status='replace')
 
   IERR = IPOPENOUTPUTFILE(IPROBLEM, 'IPOPT.OUT', 5)
   if (IERR.ne.0 ) then
@@ -261,6 +262,7 @@ program problemPC
   !
   call IPFREE(IPROBLEM)
   if (id_proc.eq.0) close(76)
+  if (id_proc.eq.0) close(86)
   call stop_all
   !
 9990 continue
@@ -306,13 +308,14 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
 
   call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,2,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
-  if (IDAT(2).eq.1) then ! Deterministic with PC
+ if (IDAT(2).eq.1) then ! Deterministic with PC
      fvartmp=0.0d0
      fvarprimetmp=0.0d0
   end if
 
 
   !---- COMBINED OBJECTIVE FUNCTION
+
   F=fmeantmp+fvartmp
 
   DAT(N+1)=fmeantmp
@@ -327,7 +330,7 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
      print*,''
      write(*,'(4x,a,3F13.4)') '>>Objective:',fmeantmp,fvartmp,fmeantmp+fvartmp
      write(*,'(4x,a,F13.4)') '>>Coeff of variance:',sqrt(fvartmp)/fmeantmp
-  !   print*,'fmeanprime,fvarprime:',fmeanprimetmp(1:N),fvarprimetmp(1:N)
+     !   print*,'fmeanprime,fvarprime:',fmeanprimetmp(1:N),fvarprimetmp(1:N)
   end if
 
 !  stop
@@ -413,7 +416,8 @@ subroutine EV_G(N, X, NEW_X, M, G, IDAT, DAT, IERR)
      print*,''
      write(*,'(4x,a)') '>>Normalized Constraint Values:'
      do i=1,8
-        write(*,'(3E13.2)'),cmean(i),cstd(i),g(i)
+        write(*,'(3E13.5,f13.5)'),cmean(i),cstd(i),g(i),cmean(i)/cstd(i)
+        DAT(1020+i)=(cmean(i)/cstd(i))
      end do
      print*,''
   end if
@@ -462,8 +466,7 @@ subroutine EV_GRAD_F(N, X, NEW_X, GRAD, IDAT, DAT, IERR)
   do i=1,N
      if (x(i).ne.DAT(2*N+2+i)) samex=.false. 
   end do
-  
-  
+   
   
   if (samex) then
 
@@ -500,11 +503,11 @@ subroutine EV_GRAD_F(N, X, NEW_X, GRAD, IDAT, DAT, IERR)
 
   call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,2,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
-     if (IDAT(2).eq.1) then
-        fvartmp=0.0
-        fvarprimetmp(:)=0.0
-     end if
-
+  if (IDAT(2).eq.1) then
+     fvartmp=0.0
+     fvarprimetmp(:)=0.0
+  end if
+  
      !---- OBJECTIVE FUNCTION gradient and x value
 
      do i=1,N
@@ -936,16 +939,19 @@ subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_S
      if (ITER_COUNT .eq.0) then
         write(*,*) 
         write(*,*) 'iter    objective      ||grad||        inf_pr          inf_du         lg(mu)'
+        write(86,*) 'iter    objective    betag1    betag2    betag3   betag4    betag5    betag6     betag7    betag8'
      end if
 
      write(*,'(i5,5e15.7)') ITER_COUNT,OBJVAL,DNORM,INF_PR,INF_DU,MU
      write(76,'(i5,5e15.7)') ITER_COUNT,OBJVAL,DNORM,INF_PR,INF_DU,MU
+     write(86,'(i5,9e15.7)') ITER_COUNT,OBJVAL,DAT(1020+1),DAT(1020+2),DAT(1020+3),DAT(1020+4),DAT(1020+5),DAT(1020+6),DAT(1020+7),DAT(1020+8)
+
   end if
   !
   !     And set ISTOP to 1 if you want Ipopt to stop now.  Below is just a
   !     simple example.
   !
-  if (ITER_COUNT .gt. 1 .and. DNORM.le.1D-03 .and. inf_pr.le.1.0D-04) ISTOP = 1
+  if (ITER_COUNT .gt. 1 .and. DNORM.le.1D-03 .and. inf_pr.le.1.0D-03) ISTOP = 1
 
   
   return
@@ -965,8 +971,8 @@ subroutine epigrads(fct,fctindx,dim,ndimt,xtmp,xstdt,ftmp,dftmp)
 
   gtol=1e-6
 
-  low(1:ndimt-DIM)= xtmp(1:ndimt-DIM)  + xstdt(1:ndimt-DIM)
-  up(1:ndimt-DIM) = xtmp(1:ndimt-DIM)  + xstdt(1:ndimt-DIM)
+  low(1:ndimt-DIM)= xtmp(1:ndimt-DIM) !  + xstdt(1:ndimt-DIM)
+  up(1:ndimt-DIM) = xtmp(1:ndimt-DIM) !  + xstdt(1:ndimt-DIM)
 
   call optimize(ndimt-DIM,xtmp,ndimt,ftmp,dftmp,low,up,gtol,.true.,.false.,fctindx)
 
