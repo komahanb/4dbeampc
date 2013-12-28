@@ -22,3 +22,5 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
    4  1.3858526e+01 1.66e-01 9.16e+00  -0.7 1.34e+00    -  6.68e-01 9.99e-01h  1
    5  1.4627395e+01 6.80e-02 3.29e+00  -1.2 6.43e-01    -  1.00e+00 6.63e-01h  1
    6  1.5077697e+01 4.46e-02 9.25e+00  -1.2 5.58e-01    -  8.98e-01 3.26e-01h  1
+Exception of type: IpoptException in file "Unknown File" at line -1:
+ Exception message: Unknown Exception caught in Ipopt

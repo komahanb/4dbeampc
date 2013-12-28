@@ -115,7 +115,7 @@ program problemPC
   !===================================================================
 
   probtype(:)=1
-  kprob=2
+  kprob=3
 
   IDAT(1)=kprob
   IDAT(2)=0

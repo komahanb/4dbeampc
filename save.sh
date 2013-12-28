@@ -1,6 +1,6 @@
-read -p "Enter kprob value:" i
-cp Opt.his kprob$i/
-cp HISTG* kprob$i/
-cp screen kprob$i/
-cp fort.* kprob$i/
-echo "Success saving the results into kprob"$i
+#read -p "Enter prob value:" i
+cp Opt.his kprob0/
+cp HISTG* kprob0/
+cp screen kprob0/
+cp fort.* kprob0/
+echo "Success saving the results into kprob0"
