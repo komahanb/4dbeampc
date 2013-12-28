@@ -1,6 +1,6 @@
 program problemPC
 
-  use dimpce,only:probtype,id_proc
+  use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
 
   implicit none
   !
@@ -69,6 +69,12 @@ program problemPC
   !======================================
   !(1)    Set initial point and bounds:
   !=======================================
+
+  ! Evals counter initialization
+
+  fcnt=0
+  fgcnt=0
+  fghcnt=0
 
   ! Area design variables
 
@@ -279,7 +285,7 @@ end program problemPC
 !
 
 subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
-  use dimpce,only:probtype,id_proc
+  use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
 
   implicit none
   integer N, NEW_X,I
@@ -352,7 +358,7 @@ end subroutine EV_F
 ! =============================================================================
 !
 subroutine EV_G(N, X, NEW_X, M, G, IDAT, DAT, IERR)
-  use dimpce,only:probtype,id_proc
+  use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
 
   implicit none
   integer N, NEW_X, M
@@ -449,7 +455,7 @@ end subroutine EV_G
 ! =============================================================================
 !
 subroutine EV_GRAD_F(N, X, NEW_X, GRAD, IDAT, DAT, IERR)
-  use dimpce,only:probtype,id_proc
+  use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
 
   implicit none
   integer N, NEW_X,i
@@ -530,7 +536,7 @@ end subroutine EV_GRAD_F
 ! =============================================================================
 !
 subroutine EV_JAC_G(TASK, N, X, NEW_X, M, NZ, ACON, AVAR, A,IDAT, DAT, IERR)
-  use dimpce,only:probtype,id_proc
+  use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
   
   implicit none
   integer TASK, N, NEW_X, M, NZ
@@ -922,7 +928,7 @@ end subroutine EV_HESS
 ! =============================================================================
 !
 subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_SIZE, ALPHA_DU, ALPHA_PR, LS_TRIAL, IDAT,DAT, ISTOP)
-  use dimpce,only:probtype,id_proc
+  use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
 
   implicit none
   integer ALG_MODE, ITER_COUNT, LS_TRIAL
@@ -943,7 +949,7 @@ subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_S
      end if
 
      write(*,'(i5,5e15.7)') ITER_COUNT,OBJVAL,DNORM,INF_PR,INF_DU,MU
-     write(76,'(i5,5e15.7)') ITER_COUNT,OBJVAL,DNORM,INF_PR,INF_DU,MU
+     write(76,'(i5,5e15.7,3i8)') ITER_COUNT,OBJVAL,DNORM,INF_PR,INF_DU,MU,fcnt,fgcnt,fghcnt
      write(86,'(i5,9e15.7)') ITER_COUNT,OBJVAL,DAT(1020+1),DAT(1020+2),DAT(1020+3),DAT(1020+4),DAT(1020+5),DAT(1020+6),DAT(1020+7),DAT(1020+8)
 
   end if
