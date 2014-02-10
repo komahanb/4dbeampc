@@ -1,0 +1,11 @@
+ iter    objective    betag1    betag2    betag3
+    0  0.9000000E+05       Infinity       Infinity      -Infinity
+    1  0.8969729E+05       Infinity       Infinity      -Infinity
+    2  0.8983537E+05       Infinity       Infinity      -Infinity
+    3  0.1247098E+06      -Infinity       Infinity      -Infinity
+    4  0.1114034E+06      -Infinity       Infinity      -Infinity
+    5  0.1253269E+06      -Infinity       Infinity      -Infinity
+    6  0.1254093E+06      -Infinity       Infinity      -Infinity
+    7  0.1254203E+06      -Infinity       Infinity      -Infinity
+    8  0.1254204E+06      -Infinity       Infinity      -Infinity
+    9  0.1254204E+06      -Infinity       Infinity      -Infinity

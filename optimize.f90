@@ -4,9 +4,7 @@ subroutine optimize(ndvar,D,ndvart,fobj,dfdD,low,up,gtol,maximize,outputscreen,f
 
   integer   ::   mmax,ndvar,ndvart,Nouter,maxfev,fct
   parameter      (mmax=100)  !mmax is the maximum number of limited memory corrections.
-
   double precision :: D(ndvart),fobj,dfdD(ndvart),dfdDtmp(ndvar),dfdDD(ndvart,ndvart),v(ndvart),gtol,low(ndvar),up(ndvar)
-
   character*60 :: csave,task
   logical ::      lsave(4),maximize,outputscreen
   integer ::      n, mlim, iprint, iwa(3*ndvar), isave(44), nbd(ndvar)
@@ -34,8 +32,8 @@ subroutine optimize(ndvar,D,ndvart,fobj,dfdD,low,up,gtol,maximize,outputscreen,f
   !     We suppress both code-supplied stopping tests because the
   !        user is providing his own stopping criteria.
 
-  factr=1.d+7
-  pgtol=1.d+7
+  factr=1.d+3
+  pgtol=gtol
 
   !     We specify the number m of limited memory corrections stored.  
 
@@ -61,6 +59,18 @@ subroutine optimize(ndvar,D,ndvart,fobj,dfdD,low,up,gtol,maximize,outputscreen,f
 
      call CalcstuffBFGS(D,ndvart,fobj,dfdD,fct)
 
+!!$
+!!$     if (fct.eq.0) then
+!!$
+!!$        print*,low(1:ndvar),up(1:ndvar)
+!!$        print*,'D:',D
+!!$        print*,'f:',fobj
+!!$        print*,'grad:',dfdd
+!!$
+!!$!        stop
+!!$
+!!$     end if
+
      dfdDtmp(1:ndvar)=dfdD(1:ndvar)
 
      if (maximize) then
@@ -81,6 +91,7 @@ subroutine optimize(ndvar,D,ndvart,fobj,dfdD,low,up,gtol,maximize,outputscreen,f
 
      !        go back to the minimization routine.
      goto 111
+
   endif
 
 
@@ -113,8 +124,8 @@ subroutine optimize(ndvar,D,ndvart,fobj,dfdD,low,up,gtol,maximize,outputscreen,f
 
      if(outputscreen) write (*,'(2(a,i5,4x),a,1p,d12.5,4x,a,1p,d12.5)') 'Iter',isave(30),'nfg =',isave(34),'f =',fobj,'|grad| =',normgrad
 
-
      !        go back to the minimization routine.
+
      goto 111
 
   endif

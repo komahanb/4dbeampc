@@ -14,7 +14,7 @@ EXE = MixedOUU
 
 # CHANGEME: Here is the name of all object files corresponding to the source
 #           code that you wrote in order to define the problem statement
-OBJS =  problemPC.o threebarcost.o BFGSroutines.o optimize.o CalcstuffBFGS.o
+OBJS =  dimopt.o problemPC.o BFGSroutines.o optimize.o CalcstuffBFGS.o
 
 # CHANGEME: Additional libraries
 ADDLIBS =
@@ -32,7 +32,7 @@ F77 = mpif77
 F90 = mpif90
 
 # Fotran Compiler options
-FFLAGS = -O3 -r8 -openmp # -zero -fpe0  -CB  -O0  -g3 -debug extended -ftrapuv -check all -parallel  -check
+FFLAGS = -O4 -r8 -openmp
 
 # additional Fortran Compiler options for linking
 F77LINKFLAGS =  -Wl,--rpath -Wl,/home/komahan/Dropbox/Thesis/Program/Markus/Ipopt-3.10.0/lib
@@ -44,13 +44,15 @@ LIBS = `PKG_CONFIG_PATH=/home/komahan/Dropbox/Thesis/Program/Markus/Ipopt-3.10.0
 
 all: $(EXE)
 
-.SUFFIXES: .f90 .o .F
+.SUFFIXES: .f90 .o .F .mod
 
 $(EXE): $(OBJS)  pcestimate.a Eulersolve.a libmir.a tapenade.a
 	$(F90) $(F77LINKFLAGS) $(FFLAGS) -o $@ $^ $(LIBS) -Wl,-rpath=/usr/local/lib
 
 clean:
 	rm -f $(EXE) $(OBJS) IPOPT.OUT *~
+
+%.o : %.mod
 
 %.o : %.F
 	$(F77) $(FFLAGS)  -c -o $@ $<
