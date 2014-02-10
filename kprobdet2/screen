@@ -1,0 +1,139 @@
+ 
+    >>Normalized Constraint Values:
+  0.33333E+00  0.00000E+00  0.33333E+00     Infinity
+  0.87500E+00  0.00000E+00  0.87500E+00     Infinity
+ -0.50000E+00  0.00000E+00 -0.50000E+00    -Infinity
+ 
+ 
+    >>Objective:   90000.0000       0.0000   90000.0000
+    >>Coeff of variance :       0.0000
+ 
+ iter    objective      ||grad||        inf_pr          inf_du         lg(mu)
+    0  0.9000000E+05  0.0000000E+00  0.8850000E+00  0.2999370E+03  0.1000000E+01
+ 
+    >>Normalized Constraint Values:
+  0.33736E+00  0.00000E+00  0.33736E+00     Infinity
+  0.88133E+00  0.00000E+00  0.88133E+00     Infinity
+ -0.49796E+00  0.00000E+00 -0.49796E+00    -Infinity
+ 
+ 
+    >>Objective:   89697.2863       0.0000   89697.2863
+    >>Coeff of variance :       0.0000
+    1  0.8969729E+05  0.2741217E+03  0.8814278E+00  0.7829100E+04  0.1333367E+03
+ 
+    >>Normalized Constraint Values:
+  0.33203E+00  0.00000E+00  0.33203E+00     Infinity
+  0.87844E+00  0.00000E+00  0.87844E+00     Infinity
+ -0.49626E+00  0.00000E+00 -0.49626E+00    -Infinity
+ 
+ 
+    >>Objective:   89835.3739       0.0000   89835.3739
+    >>Coeff of variance :       0.0000
+    2  0.8983537E+05  0.2168150E+03  0.8784370E+00  0.8435417E+04  0.1133303E-03
+ 
+    >>Normalized Constraint Values:
+ -0.42035E+00  0.00000E+00 -0.42035E+00    -Infinity
+  0.35314E+00  0.00000E+00  0.35314E+00     Infinity
+ -0.56420E-02  0.00000E+00 -0.56420E-02    -Infinity
+ 
+ 
+    >>Objective:  124709.8102       0.0000  124709.8102
+    >>Coeff of variance :       0.0000
+    3  0.1247098E+06  0.2378155E+03  0.8368517E+00  0.3415946E+06  0.3925592E+04
+ 
+    >>Normalized Constraint Values:
+ -0.31364E+00  0.00000E+00 -0.31364E+00    -Infinity
+  0.51477E+00  0.00000E+00  0.51477E+00     Infinity
+ -0.51107E-02  0.00000E+00 -0.51107E-02    -Infinity
+ 
+ 
+    >>Objective:  111403.3509       0.0000  111403.3509
+    >>Coeff of variance :       0.0000
+    4  0.1114034E+06  0.3056416E+03  0.7738691E+00  0.3042590E+06  0.5099051E+03
+ 
+    >>Normalized Constraint Values:
+ -0.42517E+00  0.00000E+00 -0.42517E+00    -Infinity
+  0.34648E+00  0.00000E+00  0.34648E+00     Infinity
+ -0.37726E-02  0.00000E+00 -0.37726E-02    -Infinity
+ 
+ 
+    >>Objective:  125326.9289       0.0000  125326.9289
+    >>Coeff of variance :       0.0000
+    5  0.1253269E+06  0.1041019E+03  0.5729435E+00  0.2769223E+06  0.8013448E+03
+ 
+    >>Normalized Constraint Values:
+ -0.42585E+00  0.00000E+00 -0.42585E+00    -Infinity
+  0.34559E+00  0.00000E+00  0.34559E+00     Infinity
+ -0.33574E-02  0.00000E+00 -0.33574E-02    -Infinity
+ 
+ 
+    >>Objective:  125409.3439       0.0000  125409.3439
+    >>Coeff of variance :       0.0000
+    6  0.1254093E+06  0.2439001E+01  0.5098915E+00  0.8608327E+06  0.9909081E+03
+ 
+    >>Normalized Constraint Values:
+ -0.42593E+00  0.00000E+00 -0.42593E+00    -Infinity
+  0.34548E+00  0.00000E+00  0.34548E+00     Infinity
+ -0.33524E-02  0.00000E+00 -0.33524E-02    -Infinity
+ 
+ 
+    >>Objective:  125420.3468       0.0000  125420.3468
+    >>Coeff of variance :       0.0000
+    7  0.1254203E+06  0.1553138E+02  0.5091301E+00  0.5015554E+09  0.6010235E+04
+ 
+    >>Normalized Constraint Values:
+ -0.42593E+00  0.00000E+00 -0.42593E+00    -Infinity
+  0.34547E+00  0.00000E+00  0.34547E+00     Infinity
+ -0.33522E-02  0.00000E+00 -0.33522E-02    -Infinity
+ 
+ 
+    >>Objective:  125420.4322       0.0000  125420.4322
+    >>Coeff of variance :       0.0000
+    8  0.1254204E+06  0.3161205E+01  0.5090928E+00  0.6777218E+13  0.5040138E+03
+ 
+    >>Normalized Constraint Values:
+ -0.42593E+00  0.00000E+00 -0.42593E+00    -Infinity
+  0.34547E+00  0.00000E+00  0.34547E+00     Infinity
+ -0.33522E-02  0.00000E+00 -0.33522E-02    -Infinity
+ 
+ 
+    >>Objective:  125420.4331       0.0000  125420.4331
+    >>Coeff of variance :       0.0000
+ 
+    >>Objective:  125420.4331       0.0000  125420.4331
+    >>Coeff of variance :       0.0000
+ 
+    >>Normalized Constraint Values:
+ -0.42593E+00  0.00000E+00 -0.42593E+00    -Infinity
+  0.34547E+00  0.00000E+00  0.34547E+00     Infinity
+ -0.33522E-02  0.00000E+00 -0.33522E-02    -Infinity
+ 
+ 
+    >>Normalized Constraint Values:
+ -0.42593E+00  0.00000E+00 -0.42593E+00    -Infinity
+  0.34547E+00  0.00000E+00  0.34547E+00     Infinity
+ -0.33522E-02  0.00000E+00 -0.33522E-02    -Infinity
+ 
+ 
+    >>Objective:  125420.4322       0.0000  125420.4322
+    >>Coeff of variance :       0.0000
+    9  0.1254204E+06  0.0000000E+00  0.5090928E+00  0.1000000E+04  0.1084401E+04
+ 
+ The solution was found.
+ 
+ The final value of the objective function is    125420.432213847       m^2
+ 
+ The optimal values of X are:
+ 
+ X  (           1 ) =    250.840863094741     
+ X  (           2 ) =    500.000000000000     
+ X  (           3 ) =    40000000.0000000     
+ X  (           4 ) =    150000.000000000     
+ 
+ The multipliers for the equality constraints are:
+ 
+ LAM(           1 ) =   0.000000000000000E+000
+ LAM(           2 ) =   0.000000000000000E+000
+ LAM(           3 ) =   0.000000000000000E+000
+ 
+Weight, variance, SD, CV:  125420.4322       0.0000       0.0000       0.0000

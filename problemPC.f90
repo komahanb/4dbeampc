@@ -1,5 +1,5 @@
-program problemPC
-
+program problemPCBeam
+  use dimopt
   use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
 
   implicit none
@@ -12,7 +12,7 @@ program problemPC
   !     Size of the problem (number of variables and equality constraints)
   !
   integer     N,     M,     NELE_JAC,     NELE_HESS,      IDX_STY
-  parameter  (N = 6, M = 8, NELE_JAC = 48, NELE_HESS = 21)
+  parameter  (N = 4, M = 3, NELE_JAC = 12, NELE_HESS = 10)
   parameter  (IDX_STY = 1 )
   !
   !     Space for multipliers and constraints
@@ -46,7 +46,7 @@ program problemPC
   integer IPADDNUMOPTION, IPADDINTOPTION
   integer IPOPENOUTPUTFILE
   !
-  double precision F,Fs,sigmax(N),pi
+  double precision F,Fs,sigmax(N)
   integer i,kprob
 
   double precision  infbound
@@ -64,7 +64,7 @@ program problemPC
   !**********************************************************************
 
 
-  pi=4.0*atan(1.0) ! constant for later use (visible globally)
+!  pi=4.0*atan(1.0) ! constant for later use (visible globally)
 
   !======================================
   !(1)    Set initial point and bounds:
@@ -76,46 +76,33 @@ program problemPC
   fgcnt=0
   fghcnt=0
 
-  ! Area design variables
+  !Breadth and depth of the bar
 
-  do i=1,N-3
-     X(i)   = 2.0  
-     X_L(i) = 0.25d0
-     X_U(i) = 5.0d0
+  do i=1,N-2
+     X(i)   = 300.0  
+     X_L(i) = 100.0 
+     X_U(i) = 600.0
   end do
 
-!  x(1)=4.0
-!  x(2)=0.0
-!  x(3)=1.75
-  ! orientation design variables
+  ! Bending moment (Aleatory)
 
-  ! phi(1)
-  X(4)   = 45.0*pi/180.0
-  X_L(4) = 30.0*pi/180.0
-  X_U(4) = 60.0*pi/180.0
+  X(3)  = 40.0e6 !N.m
+  X_L(3)= 40.0e6 !N.m
+  X_U(3)= 40.0e6 !N.m
 
-  !phi(2)
-  X(5)   = 90.0*pi/180.0
-  X_L(5) = 60.0*pi/180.0
-  X_U(5) = 120.0*pi/180.0
+  ! Shear force  (Aleatory)
 
-  !phi(3)
-  X(6)   = (90.0+45.0)*pi/180.0
-  X_L(6) = (90.0+30.0)*pi/180.0
-  X_U(6) = (90.0+60.0)*pi/180.0
+  X(4)  = 150.0e3 !N
+  X_L(4)= 150.0e3 !N
+  X_U(4)= 150.0e3 !N
 
-!!$
-!!$
-!!$  x(4)=0.766835821510991
-!!$  x(5)=1.04579905681238
-!!$  x(6)=2.38235875550730
 
   !===================================================================
-  !(2) Integer Settings and store into IDAT (check for size above)
+  !(2)Integer Settings and store into IDAT (check for size above)
   !===================================================================
 
   probtype(:)=1
-  kprob=4
+  kprob=0
 
   IDAT(1)=kprob
   IDAT(2)=0
@@ -125,15 +112,11 @@ program problemPC
   !(3)     Setup std dev and store in to dat(1:N)
   !===============================================
 
-  sigmax(1)=0.01
-  sigmax(2)=0.01
-  sigmax(3)=0.01
+  sigmax(1)=10.0
+  sigmax(2)=10.0
 
-  ! SD for orientation phi
-
-  sigmax(4)=1.0*pi/180.0
-  sigmax(5)=1.0*pi/180.0
-  sigmax(6)=1.0*pi/180.0
+  sigmax(3)=40.0d3
+  sigmax(4)=1500.0
 
   do i=1,n
      dat(i)=sigmax(i)
@@ -147,41 +130,33 @@ program problemPC
      G_L(i)=-infbound
      G_U(i)=0.d0
   end do
-
+  
+  !
+  ! Equality constraint
+  !
+  
+  G_L(M)=0.0d0
+  G_U(M)=0.0d0
+  
   !===========================================================
   !(5)    Other constants to be passed to the surrogate call
   !===========================================================
-
-  pi=4.0*atan(1.0) ! constant for later use
-
+  
+  !  pi=4.0*atan(1.0) ! constant for later use
+  
   !Problem data and other constants
-  dat(1000+1)=10.0 !height ref
-  dat(1000+2)=1.0e7 !E
-  dat(1000+3)=0.1 !gamma
-  dat(1000+4)=50.0*pi/180.0
-  dat(1000+5)=30000.0
-
-  ! Max constraint values
-  !Tensile
-  dat(1000+6)=5000.0    ! psi tensile_sigma1_max=dat(6)      
-  dat(1000+7)=10000.0    ! psi tensile_sigma2_max=dat(7)
-  dat(1000+8)=5000.0    ! psi tensile_sigma3_max=dat(8)
-  !Compressive
-  dat(1000+9)=5000.0    ! psi comp_sigma1_max=dat(9)
-  dat(1000+10)=10000.0   ! psi comp_sigma2_max=dat(10)
-  dat(1000+11)=5000.0   ! psi comp_sigma3_max=dat(11)
-  !Displacement
-  dat(1000+12)=0.005    ! in  max_u_disp=dat(12)
-  dat(1000+13)=0.005    ! in  max_v_disp=dat(12)
-  dat(1000+14)=1.0      ! Factor of safety
-  dat(1000+20)=77      ! filenum for PC
+  
+  dat(1000+1)=10.0 !Sigma_allow
+  dat(1000+2)=2.0  !Tau_allow
+  dat(1000+3)=1.00  !Factor of safety
+  dat(1000+20)=77  !filenum for PC
 
 
   !=================================================================
   !
   !     First create a handle for the Ipopt problem (and read the options
   !     file)
-  !
+  !=================================================================
 
   IPROBLEM = IPCREATE(N, X_L, X_U, M, G_L, G_U, NELE_JAC, NELE_HESS,IDX_STY, EV_F, EV_G, EV_GRAD_F, EV_JAC_G, EV_HESS)
   if (IPROBLEM.eq.0) then
@@ -191,10 +166,12 @@ program problemPC
   !
   !     Open an output file
   !
-
   if (id_proc.eq.0) open(unit=76,file='Opt.his',form='formatted',status='replace')
 
   if (id_proc.eq.0) open(unit=86,file='beta.his',form='formatted',status='replace')
+
+  if (id_proc.eq.0) open(unit=37,file='dv.his',form='formatted',status='replace')
+
 
   IERR = IPOPENOUTPUTFILE(IPROBLEM, 'IPOPT.OUT', 5)
   if (IERR.ne.0 ) then
@@ -240,16 +217,12 @@ program problemPC
         write(*,*)
      endif
 
-     write(*,*) 'The final value of the objective function is ',F
+     write(*,*) 'The final value of the objective function is ',F,' m^2'
      write(*,*)
      write(*,*) 'The optimal values of X are:'
      write(*,*)
      do i = 1, N
-        if(i.GT.3) then
-           write(*,*) 'X  (',i,') = ',X(i)*180.0/pi,'deg'
-        else
-           write(*,*) 'X  (',i,') = ',X(i),'in^2'
-        end if
+        write(*,*) 'X  (',i,') = ',X(i)
      enddo
      write(*,*)
      write(*,*) 'The multipliers for the equality constraints are:'
@@ -259,7 +232,6 @@ program problemPC
      enddo
      write(*,*)
      write(*,'(a,4F13.4)') 'Weight, variance, SD, CV:',DAT(N+1),DAT(N+2),sqrt(DAT(N+2)),sqrt(DAT(N+2))/DAT(N+1)
-
   end if
   !
 9000 continue
@@ -269,13 +241,15 @@ program problemPC
   call IPFREE(IPROBLEM)
   if (id_proc.eq.0) close(76)
   if (id_proc.eq.0) close(86)
+  if (id_proc.eq.0) close(37)
+
   call stop_all
   !
 9990 continue
   write(*,*) 'Error setting an option'
   goto 9000
 
-end program problemPC
+end program problemPCBeam
 !
 ! =============================================================================
 !
@@ -286,7 +260,7 @@ end program problemPC
 
 subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
   use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
-
+  use dimopt
   implicit none
   integer N, NEW_X,I
   double precision F, X(N),sigmax(N),fmeantmp,fvartmp,fmeanprimetmp(n),fvarprimetmp(n)
@@ -298,8 +272,6 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
   double precision  rho, L, sigmay, pi, p, E, Fs 
   integer::myflag(10) 
         
-  
-  
   kprob=IDAT(1)
   probtype(1:N)=IDAT(3:N+2)
 
@@ -307,21 +279,29 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
      sigmax(i)=DAT(i)
      Xsave(i)=X(i)
   end do
+
   !---- MEAN and VARIANCE OF worst OBJECTIVE FUNCTION
 
+  
+  if (IDAT(2).eq.1) then ! Deterministic with PC
 
-!  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
+     call CalcExact(X,N,fmeantmp,fmeanprimetmp,0,DAT(1001:1020))
 
-  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
-
- if (IDAT(2).eq.1) then ! Deterministic with PC
      fvartmp=0.0d0
      fvarprimetmp=0.0d0
-  end if
 
+  else
+
+     call PCestimate(N-2,N,x,sigmax,23,0,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+     if (fvartmp.lt.0.0) fvartmp=0.0
+     
+  end if
+  
+  do i=1,n
+     data(i)=x(i)
+  end do
 
   !---- COMBINED OBJECTIVE FUNCTION
-
   F=fmeantmp+fvartmp
 
   DAT(N+1)=fmeantmp
@@ -335,8 +315,7 @@ subroutine EV_F(N, X, NEW_X, F, IDAT, DAT, IERR)
   if (id_proc.eq.0) then
      print*,''
      write(*,'(4x,a,3F13.4)') '>>Objective:',fmeantmp,fvartmp,fmeantmp+fvartmp
-     write(*,'(4x,a,F13.4)') '>>Coeff of variance:',sqrt(fvartmp)/fmeantmp
-     !   print*,'fmeanprime,fvarprime:',fmeanprimetmp(1:N),fvarprimetmp(1:N)
+     write(*,'(4x,a,F13.4)') '>>Coeff of variance :',sqrt(fvartmp)/fmeantmp
   end if
 
 !  stop
@@ -374,7 +353,6 @@ subroutine EV_G(N, X, NEW_X, M, G, IDAT, DAT, IERR)
 
   kprob=IDAT(1)
   probtype(1:N)=IDAT(3:N+2)
-
   
   do i=1,N
      sigmax(i)=DAT(i)
@@ -386,23 +364,29 @@ subroutine EV_G(N, X, NEW_X, M, G, IDAT, DAT, IERR)
   do i=1,M
 
      !---- MEAN OF INEQUALITY CONSTRAINT i
-     
-     !  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
-     
-     call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+
 
      if (IDAT(2).eq.1) then
+
+        call CalcExact(X,N,fmeantmp,fmeanprimetmp,i,DAT(1001:1020))
         fvartmp=0.0
         fvarprimetmp(:)=0.0
+
+     else
+
+     call PCestimate(N-2,N,x,sigmax,23,i,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+     if (fvartmp.lt.0.0) fvartmp=0.0
+
      end if
 
 !     if(id_proc.eq.0)   print*,"me,st:",fmeantmp,fvartmp
-     
+
      cmean(i)=fmeantmp
      cstd(i)=sqrt(fvartmp)
-
+     
 !     if(id_proc.eq.0)   print*,"me,st:",cmean(i),cstd(i)
- !    if(id_proc.eq.0)   print*,"mp,vp:",fmeanprimetmp(1:N),fvarprimetmp(1:N)
+!     if(id_proc.eq.0)   print*,"mp,vp:",fmeanprimetmp(1:N),fvarprimetmp(1:N)
+
 
      do j=1,N
         dc(i,j)=fmeanprimetmp(j)
@@ -421,7 +405,7 @@ subroutine EV_G(N, X, NEW_X, M, G, IDAT, DAT, IERR)
   if (id_proc.eq.0) then
      print*,''
      write(*,'(4x,a)') '>>Normalized Constraint Values:'
-     do i=1,8
+     do i=1,M
         write(*,'(3E13.5,f13.5)'),cmean(i),cstd(i),g(i),cmean(i)/cstd(i)
         DAT(1020+i)=(cmean(i)/cstd(i))
      end do
@@ -472,7 +456,6 @@ subroutine EV_GRAD_F(N, X, NEW_X, GRAD, IDAT, DAT, IERR)
   do i=1,N
      if (x(i).ne.DAT(2*N+2+i)) samex=.false. 
   end do
-   
   
   if (samex) then
 
@@ -505,23 +488,27 @@ subroutine EV_GRAD_F(N, X, NEW_X, GRAD, IDAT, DAT, IERR)
 
      !---- MEAN and VARIANCE OF worst OBJECTIVE FUNCTION
 
-!  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
 
-  call PCestimate(N-3,N,x,sigmax,23,0,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
 
-  if (IDAT(2).eq.1) then
-     fvartmp=0.0
-     fvarprimetmp(:)=0.0
-  end if
-  
+     if (IDAT(2).eq.1) then
+
+        call CalcExact(X,N,fmeantmp,fmeanprimetmp,0,DAT(1001:1020))
+        fvartmp=0.0
+        fvarprimetmp(:)=0.0
+
+     else
+
+     call PCestimate(N-2,N,x,sigmax,23,0,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+     if (fvartmp.lt.0.0) fvartmp=0.0
+
+     end if
+
      !---- OBJECTIVE FUNCTION gradient and x value
 
      do i=1,N
         grad(i)=fmeanprimetmp(i)+fvarprimetmp(i)
      end do
-
 !!$         if (id_proc.eq.0) print *,'Obj Gradient',GRAD(1:3)
-
   end if
 
   IERR = 0
@@ -549,136 +536,55 @@ subroutine EV_JAC_G(TASK, N, X, NEW_X, M, NZ, ACON, AVAR, A,IDAT, DAT, IERR)
   integer IERR, kprob
   logical samex
   integer::myflag(10) 
+
   if( TASK.eq.0 ) then 
 
      !
      !     structure of Jacobian:
      !
+     
+     
+     ACON(1) = 1
+     AVAR(1) = 1
+
+     ACON(2) = 1
+     AVAR(2) = 2
+
+     ACON(3) = 1
+     AVAR(3) = 3
+
+     ACON(4) = 1
+     AVAR(4) = 4
 
 
-     ACON(1)  =1
-     AVAR(1)  =1
-     ACON(2)  =1
-     AVAR(2)  =2
-     ACON(3)  =1
-     AVAR(3)  =3
-     ACON(4)  =1 
-     AVAR(4)  =4
-     ACON(5)  =1
-     AVAR(5)  =5
-     ACON(6)  =1
-     AVAR(6)  =6
+     ! con 2
+
+     ACON(5) = 2
+     AVAR(5) = 1
+
+     ACON(6) = 2
+     AVAR(6) = 2
+
+     ACON(7) = 2
+     AVAR(7) = 3
+
+     ACON(8) = 2
+     AVAR(8) = 4
+
+     !con 3
 
 
+     ACON(9)  = 3
+     AVAR(9)  = 1
 
+     ACON(10) = 3
+     AVAR(10) = 2
 
+     ACON(11) = 3
+     AVAR(11) = 3
 
-     ACON(7)  =2 
-     AVAR(7)  =1
-     ACON(8)  =2
-     AVAR(8)  =2
-     ACON(9)  =2
-     AVAR(9)  =3
-     ACON(10) =2
-     AVAR(10) =4
-     ACON(11) =2
-     AVAR(11) =5
-     ACON(12) =2
-     AVAR(12) =6
-
-
-
-     ACON(13) =3
-     AVAR(13) =1
-     ACON(14) =3
-     AVAR(14) =2
-     ACON(15) =3
-     AVAR(15) =3
-     ACON(16) =3
-     AVAR(16) =4
-     ACON(17) =3
-     AVAR(17) =5
-     ACON(18) =3
-     AVAR(18) =6
-
-
-
-     ACON(19) =4
-     AVAR(19) =1
-     ACON(20) =4
-     AVAR(20) =2
-     ACON(21) =4
-     AVAR(21) =3
-     ACON(22) =4
-     AVAR(22) =4
-     ACON(23) =4
-     AVAR(23) =5
-     ACON(24) =4
-     AVAR(24) =6
-
-
-
-     ACON(25) =5
-     AVAR(25) =1
-     ACON(26) =5
-     AVAR(26) =2
-     ACON(27) =5
-     AVAR(27) =3
-     ACON(28) =5
-     AVAR(28) =4
-     ACON(29) =5
-     AVAR(29) =5
-     ACON(30) =5
-     AVAR(30) =6
-
-
-
-
-     ACON(31) =6
-     AVAR(31) =1
-     ACON(32) =6
-     AVAR(32) =2
-     ACON(33) =6
-     AVAR(33) =3
-     ACON(34) =6
-     AVAR(34) =4
-     ACON(35) =6
-     AVAR(35) =5
-     ACON(36) =6
-     AVAR(36) =6
-
-
-
-
-     ACON(37) =7
-     AVAR(37) =1
-     ACON(38) =7
-     AVAR(38) =2
-     ACON(39) =7
-     AVAR(39) =3
-     ACON(40) =7
-     AVAR(40) =4
-     ACON(41) =7
-     AVAR(41) =5
-     ACON(42) =7
-     AVAR(42) =6
-
-
-
-
-     ACON(43) =8
-     AVAR(43) =1
-     ACON(44) =8
-     AVAR(44) =2
-     ACON(45) =8
-     AVAR(45) =3
-     ACON(46) =8
-     AVAR(46) =4
-     ACON(47) =8
-     AVAR(47) =5
-     ACON(48) =8
-     AVAR(48) =6
-
+     ACON(12) = 3
+     AVAR(12) = 4
 
 
   else
@@ -719,16 +625,19 @@ subroutine EV_JAC_G(TASK, N, X, NEW_X, M, NZ, ACON, AVAR, A,IDAT, DAT, IERR)
         do i=1,M
 
            !---- MEAN OF INEQUALITY CONSTRAINT i
-
-!  call PCestimate(ndimint,dim,xavgin,xstdin,fctin,fctindxin,DATIN,OSin,orderinitial,orderfinal,statin,probtypeIN,fmeanout,fvarout,fmeanprimeout,fvarprimeout,fmeandbleprimeout,fvardbleprimeout)
-
-  call PCestimate(N-3,N,x,sigmax,23,i,DAT(1001:1020),2,4,4,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
-
-           if (fvartmp.lt.0.0) fvartmp=0.0
-
+           
+           
            if (IDAT(2).eq.1) then
+           
+              call CalcExact(X,N,fmeantmp,fmeanprimetmp,i,DAT(1001:1020))
               fvartmp=0.0
               fvarprimetmp(:)=0.0
+
+           else
+
+              call PCestimate(N-2,N,x,sigmax,23,i,DAT(1001:1020),2,3,3,0,probtype,fmeantmp,fvartmp,fmeanprimetmp,fvarprimetmp,fmeandbleprimetmp,fvardbleprimetmp)
+              if (fvartmp.lt.0.0) fvartmp=0.0
+
            end if
 
            do j=1,N
@@ -741,68 +650,27 @@ subroutine EV_JAC_G(TASK, N, X, NEW_X, M, NZ, ACON, AVAR, A,IDAT, DAT, IERR)
         end do
 
      end if
-
-
+     
      ! Assemble
+
      A(1)=dc(1,1)
      A(2)=dc(1,2)
      A(3)=dc(1,3)
      A(4)=dc(1,4)
-     A(5)=dc(1,5)
-     A(6)=dc(1,6)
 
-     A(7)=dc(2,1)
-     A(8)=dc(2,2)
-     A(9)=dc(2,3)
-     A(10)=dc(2,4)
-     A(11)=dc(2,5)
-     A(12)=dc(2,6)
 
-     A(13)=dc(3,1)
-     A(14)=dc(3,2)
-     A(15)=dc(3,3)
-     A(16)=dc(3,4)
-     A(17)=dc(3,5)
-     A(18)=dc(3,6)
+     A(5)=dc(2,1)
+     A(6)=dc(2,2)
+     A(7)=dc(2,3)
+     A(8)=dc(2,4)
 
-     A(19)=dc(4,1)
-     A(20)=dc(4,2)
-     A(21)=dc(4,3)
-     A(22)=dc(4,4)
-     A(23)=dc(4,5)
-     A(24)=dc(4,6)
-
-     A(25)=dc(5,1)
-     A(26)=dc(5,2)
-     A(27)=dc(5,3)
-     A(28)=dc(5,4)
-     A(29)=dc(5,5)
-     A(30)=dc(5,6)
-
-     A(31)=dc(6,1)
-     A(32)=dc(6,2)
-     A(33)=dc(6,3)
-     A(34)=dc(6,4)
-     A(35)=dc(6,5)
-     A(36)=dc(6,6)
-
-     A(37)=dc(7,1)
-     A(38)=dc(7,2)
-     A(39)=dc(7,3)
-     A(40)=dc(7,4)
-     A(41)=dc(7,5)
-     A(42)=dc(7,6)
-
-     A(43)=dc(8,1)
-     A(44)=dc(8,2)
-     A(45)=dc(8,3)
-     A(46)=dc(8,4)
-     A(47)=dc(8,5)
-     A(48)=dc(8,6)
-
+     A(9)=dc(3,1)
+     A(10)=dc(3,2)
+     A(11)=dc(3,3)
+     A(12)=dc(3,4)
 
      !if (id_proc.eq.0) print *,'Cons Gradients',jac(1:6)
-
+     
   end if
 
 
@@ -827,86 +695,45 @@ subroutine EV_HESS(TASK, N, X, NEW_X, OBJFACT, M, LAM, NEW_LAM,NNZH, IRNH, ICNH,
   integer IDAT(*), kprob
   integer IERR
   integer::myflag(10) 
+  
   if( TASK.eq.0 ) then
+
      !
      !     structure of sparse Hessian (lower triangle):
      !
-    
 
-         IRNH(1) = 1
-         ICNH(1) = 1
+     IRNH(1) = 1
+     ICNH(1) = 1
 
-         IRNH(2) = 2
-         ICNH(2) = 2
+     IRNH(2) = 2
+     ICNH(2) = 2
 
-         IRNH(3) = 3
-         ICNH(3) = 3
+     IRNH(3)=  3
+     ICNH(3)=  3
 
-         IRNH(4) = 4
-         ICNH(4) = 4
+     IRNH(4)=4
+     ICNH(4)=4
 
-         IRNH(5) = 5
-         ICNH(5) = 5
+     IRNH(5)= 2
+     ICNH(5)=1
 
-         IRNH(6) = 6
-         ICNH(6) = 6
 
-!!!!!!! diag 2
-         IRNH(7) = 2
-         ICNH(7) = 1
+     IRNH(6)=3
+     ICNH(6)=2
 
-         IRNH(8) = 3
-         ICNH(8) = 2
-        
-         IRNH(9) = 4
-         ICNH(9) = 3
-        
-         IRNH(10) = 5
-         ICNH(10) = 4
-        
-         IRNH(11) = 6
-         ICNH(11) = 5
+     IRNH(7)=4
+     ICNH(7)=3
 
-!!!!!   diag 3
-         IRNH(12) = 3
-         ICNH(12) = 1
-        
-         IRNH(13) = 4
-         ICNH(13) = 2
-        
-         IRNH(14) = 5
-         ICNH(14) = 3
-        
-         IRNH(15) = 6
-         ICNH(15) = 4
-        
+     IRNH(8)=3
+     ICNH(8)=1
 
-!!!!! diag4
+     IRNH(9)=4
+     ICNH(9)=2
 
-         IRNH(16) = 4
-         ICNH(16) = 1
-        
-         IRNH(17) = 5
-         ICNH(17) = 2
-        
-         IRNH(18) = 6
-         ICNH(18) = 3
-        
+     IRNH(10) = 4
+     ICNH(10) = 1
 
-!!! diag5
 
-         IRNH(19) = 5
-         ICNH(19) = 1
-        
-         IRNH(20) = 6
-         ICNH(20) = 2
-
-!!! diag 6
-
-       
-         IRNH(21) = 6
-         ICNH(21) = 1
-         
  
   else
 
@@ -928,15 +755,16 @@ end subroutine EV_HESS
 ! =============================================================================
 !
 subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_SIZE, ALPHA_DU, ALPHA_PR, LS_TRIAL, IDAT,DAT, ISTOP)
+  use dimopt
   use dimpce,only:probtype,id_proc,fcnt,fgcnt,fghcnt
-
   implicit none
   integer ALG_MODE, ITER_COUNT, LS_TRIAL
   double precision OBJVAL, INF_PR, INF_DU, MU, DNORM, REGU_SIZE
   double precision ALPHA_DU, ALPHA_PR
-  double precision DAT(*)
+  double precision DAT(*),tol
   integer IDAT(*)
   integer ISTOP
+
   !
   !     You can put some output here
   !
@@ -945,24 +773,40 @@ subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_S
      if (ITER_COUNT .eq.0) then
         write(*,*) 
         write(*,*) 'iter    objective      ||grad||        inf_pr          inf_du         lg(mu)'
-        write(86,*) 'iter    objective    betag1    betag2    betag3   betag4    betag5    betag6     betag7    betag8'
+        write(86,*) 'iter    objective    betag1    betag2    betag3'
+        write(37,*) 'iter    X1    X2        X3    X4'
+                     
      end if
 
      write(*,'(i5,5e15.7)') ITER_COUNT,OBJVAL,DNORM,INF_PR,INF_DU,MU
      write(76,'(i5,5e15.7,3i8)') ITER_COUNT,OBJVAL,DNORM,INF_PR,INF_DU,MU,fcnt,fgcnt,fghcnt
-     write(86,'(i5,9e15.7)') ITER_COUNT,OBJVAL,DAT(1020+1),DAT(1020+2),DAT(1020+3),DAT(1020+4),DAT(1020+5),DAT(1020+6),DAT(1020+7),DAT(1020+8)
-
+     write(86,'(i5,4e15.7)') ITER_COUNT,OBJVAL,DAT(1020+1),DAT(1020+2),DAT(1020+3)
+     write(37,'(i5,5e15.7)') ITER_COUNT,OBJVAL,DATA(1),DATA(2),DATA(3),DATA(4)
+ 
   end if
+
   !
   !     And set ISTOP to 1 if you want Ipopt to stop now.  Below is just a
   !     simple example.
   !
-  if (ITER_COUNT .gt. 1 .and. DNORM.le.1D-03 .and. inf_pr.le.1.0D-03) ISTOP = 1
+  
+  if (ITER_COUNT .gt. 1 ) then
+     
+     open(unit=59,file='dnorm.inp',status='old')
+     read(59,*) tol
+     close(59)
+
+     if (DNORM.le.tol) ISTOP = 1  
+
+  end if
+
+
 
   
   return
 end subroutine ITER_CB
-  !===================
+
+!===================
 
 subroutine epigrads(fct,fctindx,dim,ndimt,xtmp,xstdt,ftmp,dftmp)
   use omp_lib
@@ -977,10 +821,12 @@ subroutine epigrads(fct,fctindx,dim,ndimt,xtmp,xstdt,ftmp,dftmp)
 
   gtol=1e-6
 
-  low(1:ndimt-DIM)= xtmp(1:ndimt-DIM) !  + xstdt(1:ndimt-DIM)
-  up(1:ndimt-DIM) = xtmp(1:ndimt-DIM) !  + xstdt(1:ndimt-DIM)
+  low(1:ndimt-DIM)= xtmp(1:ndimt-DIM)  !+ xstdt(1:ndimt-DIM)
+  up(1:ndimt-DIM) = xtmp(1:ndimt-DIM)  !+ xstdt(1:ndimt-DIM)
 
   call optimize(ndimt-DIM,xtmp,ndimt,ftmp,dftmp,low,up,gtol,.true.,.false.,fctindx)
+
+!  call optimize(ndvar,D,ndvart,fobj,dfdD,low,up,gtol,maximize,outputscreen,fct)
 
   return
 end subroutine epigrads
