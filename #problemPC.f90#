@@ -9,7 +9,7 @@ program problemPCBeam
   include 'IpReturnCodes.inc'
   include 'mpif.h'
   !
-  !     Size of the problem (number of variables and equality constraints)
+  !     Size of the problem (number of variables and equalityconstraints)
   !
   integer     N,     M,     NELE_JAC,     NELE_HESS,      IDX_STY
   parameter  (N = 4, M = 3, NELE_JAC = 12, NELE_HESS = 10)
@@ -800,9 +800,6 @@ subroutine ITER_CB(ALG_MODE, ITER_COUNT,OBJVAL, INF_PR, INF_DU,MU, DNORM, REGU_S
 
   end if
 
-
-
-  
   return
 end subroutine ITER_CB
 
@@ -821,8 +818,8 @@ subroutine epigrads(fct,fctindx,dim,ndimt,xtmp,xstdt,ftmp,dftmp)
 
   gtol=1e-6
 
-  low(1:ndimt-DIM)= xtmp(1:ndimt-DIM)  !+ xstdt(1:ndimt-DIM)
-  up(1:ndimt-DIM) = xtmp(1:ndimt-DIM)  !+ xstdt(1:ndimt-DIM)
+  low(1:ndimt-DIM)= xtmp(1:ndimt-DIM)  - xstdt(1:ndimt-DIM)
+  up(1:ndimt-DIM) = xtmp(1:ndimt-DIM)  + xstdt(1:ndimt-DIM)
 
   call optimize(ndimt-DIM,xtmp,ndimt,ftmp,dftmp,low,up,gtol,.true.,.false.,fctindx)
 
